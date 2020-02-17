@@ -54,4 +54,10 @@ public class Scorer {
             return playerTotalScore > dealerTotalScore ? "Player wins with " + playerTotalScore : "Draw";
         }
     }
+
+    public boolean isBlackjack(ArrayList<Card> hand) {
+        if (calculateScore(hand) == 21) {
+            return true;
+        } else return false;
+    }
 }

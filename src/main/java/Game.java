@@ -20,6 +20,14 @@ public class Game {
         returnInitialHandsString();
     }
 
+    public void dealPlayerBlackjack(){
+        dealer.setupDeckOfShuffledCards();
+        ArrayList<Card> playersHand = dealer.dealTwoCardsToDealerHandAndProvidePlayersHand();
+        player.addCard(new Card(SuitType.HEARTS, RankType.ACE));
+        player.addCard(new Card(SuitType.HEARTS, RankType.TEN));
+        returnInitialHandsString();
+    }
+
     public void returnInitialHandsString() {
         System.out.println("Player has " + player.getHand().get(0).getRank() + " and " + player.getHand().get(1).getRank() + ". Dealer top card is: " + dealer.getHand().get(1).getRank());
     }
@@ -59,27 +67,30 @@ public class Game {
 
     public void playRound() {
         dealBlackjackCards();
-        Scanner stickOrTwist = new Scanner(System.in); // get input
-        Boolean proceed = true;
-        while (proceed) {
-            System.out.println("Stick (1) or Twist (2)?");
-            int userResponse = stickOrTwist.nextInt();  // Read user input
-            if (userResponse == 1) {
-                proceed = false;
-                System.out.println("You chose to Stick");
-                System.out.println("Your total is: " + scorer.calculateScore(player.getHand()));
-                compareDealerHand();
+//        dealPlayerBlackjack();
+        if(!scorer.isBlackjack(player.getHand())) {
+            Scanner stickOrTwist = new Scanner(System.in); // get input
+            Boolean proceed = true;
+            while (proceed) {
+                System.out.println("Stick (1) or Twist (2)?");
+                int userResponse = stickOrTwist.nextInt();  // Read user input
+                if (userResponse == 1) {
+                    proceed = false;
+                    System.out.println("You chose to Stick");
+                    System.out.println("Your total is: " + scorer.calculateScore(player.getHand()));
+                    compareDealerHand();
+                }
+                if (userResponse == 2 && scorer.calculateScore(player.getHand()) < 21) {
+                    Card newCard = dealer.dealAdditionalCard(dealer.getDeck());
+                    player.getHand().add(newCard);
+                    printAddedCard();
+                }
+                if (scorer.calculateScore(player.getHand()) > 21) {
+                    proceed = false;
+                    System.out.println("Bust!");
+                }
             }
-            if (userResponse == 2 && scorer.calculateScore(player.getHand()) < 21) {
-                Card newCard = dealer.dealAdditionalCard(dealer.getDeck());
-                player.getHand().add(newCard);
-                printAddedCard();
-            }
-            if (scorer.calculateScore(player.getHand()) > 21) {
-                proceed = false;
-                System.out.println("Bust!");
-            }
-        }
+        } else System.out.println("Blackjack! You win!");
 
     }
 
